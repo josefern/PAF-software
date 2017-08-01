@@ -1,0 +1,161 @@
+                          
+
+          P A F : A software tool to estimate free-geometry extended bodies of anomalous pressure from surface deformation data.
+
+
+                    
+                                                     U S E R  M A N U A L 
+
+
+
+
+by  A.G. Camacho (1), J. Fernández (1*), F. Cannavó (2)
+
+(1) Institute of Geosciences (CSIC-UCM), Madrid, Spain
+(2) Osservatorio Etneo, Istituto Nazionale di Geofisica e Vulcanologia, Catania, Italy. 
+
+*Corresponding author:
+e-mail: jft@mat.ucm.es; phone: +34-913944632
+
+
+
+
+1. INTRODUCTION
+
+The software package PAF carries out inversions of surface deformation data (InSAR, GPS, and terrestrial data) as produced by 3D free-geometry extended bodies with anomalous pressure changes. The anomalous structures are described as aggregation of elementary cells (point sources) in an elastic half space. The linear inverse problem (supply with some simple regularization conditions) is solved by means of an exploratory approach. This software can be freely downloaded from the journal web page or asked to the corresponding author, and used to invert large data sets (e.g. InSAR data sets) or with data coming from small control networks (e.g. GPS monitoring data), mainly in volcanic areas to estimate the expected causative pressure bodies.
+Keywords: software, surface deformations, pressure sources, volcanic monitoring.
+ 
+
+
+2. THE SOFWARE PACKAGE
+
+The software package consists of two executable files: 
+
+                  ConfigPAF.exe and 
+                  InverPAF.exe. 
+
+The first one determines a 3D partition of the subsurface volume into a grid of small parallelepiped cells through a graphical interface for the input of the inversion parameters. It creates an intermediate file (CellsConfig.txt) with the information of cell partitions.
+
+The second one (InverPAF.exe) reads the displacement data and the intermediate file (CellsConfig.txt), and runs the inversion to model the observed data with some 3D extended bodies of anomalous pressure described as aggregation of filled cells.
+
+The PAF software can work in two different ways: 
+
+     (1) statically, considering large displacement data files describing the deformation field (for instance, thousands of pixels with displacement values from SAR interferometry, or combined with GPS data) for a concrete time period; and 
+
+     (2) dynamically, sequential inversion of successive stages of a deformation process (for instance, successive GPS displacement data obtained at different epochs from a permanent monitoring network.
+
+
+
+2.1. INPUT FILES AND DATA
+
+The 3D deformation data from the several sites are collected in the file DeforData.txt. 
+This file contains, for each data point:
+
+    coordinates UTM East-North (m), altitude (m), and deformation values dz (cm, positive upward), "use" value, dx (cm, positive eastward), "use" value, dy (cm, positive northward), and its "use" value. 
+
+The "use" values in the adjacent columns, associated to each measurement, are relative weighting value close to 1.0 (smaller values indicate lower quality, higher values indicate higher quality, and zero values indicate observation value not included in the inversion process).
+This data file can optionally be terminated with an end-of-file character or with a line of zeros. In the following example, data for dy (northing) are zero and they are not used ("user" zero).
+
+               425575 4527988   91.6   -0.43 1.   -0.47 1.    0  0.    
+               425844 4527985   95.7   -0.37 1.   -0.40 1.    0  0.
+               426114 4527982  105.0   -0.11 1.   -0.11 1.    0  0.
+               426383 4527980  102.7   -0.25 1.   -0.31 1.    0  0.
+               .................................................
+               422983 4515269  -2.00    0.94 1.   -3.48 1.    0  0.
+               422778 4515093  -2.00    0.57 1.   -3.16 1.    0  0.
+              0 0 0 0 0 0 0 0
+
+A secondary data file is map.bln, which can be optionally used to draw the cartography of the studied area. It includes numerical values of polygonal lines (described by the coordinates of the vertexes) with topographical details (roads, etc.). For instance:
+
+      5
+    415835.3 , 4533889.5
+    415301.7 , 4534709.2
+    415252.8 , 4534775.9
+    415255.1 , 4534970.5
+    415182.2 , 4535069.0
+
+In the case of sequential application, the successive data are provided on successive files, named Dn.txt, where n is a successive integer number (for instance D000001.txt, D000002.txt, D000003.txt ,...), and with the same format as DeforData.txt.
+ 
+
+2.2. SOFTWARE USAGE
+
+Once the data are available, the first step to perform an inversion with PAF is to generate a suitable 3D partition of the subsurface volume into a grid of small parallelepiped cells. This step is carried out by using the ConfigPAF.exe tool. This program reads the data in DeforData.txt and sets several parameters by means of a friendly dialog window (Graphical User Interface, GUI), offering default values.
+
+In the upper part of the GUI, the user can revise the default values for the geometrical parameters of the partition: 
+
+         depth (m above sea level) of the top of the partition volume, 
+         depth (m, above sea level) of the bottom of the partition volume, and
+         mean side size (m) of the cells. 
+
+Once these values are set (pressing Run/OK), the program calculates the resulting number of cells.
+Then, in the bottom part of the GUI, the program requires two more parameters: 
+
+         (a) the dimensionless smoothing coefficient ? (ranging between 0 and 1000), and, 
+         (b) a value for the (positive or negative) pressure contrast throughout the entire anomalous model, ?p (MPa). 
+
+The ? coefficient regulates the balance between data fit and model complexity in the inversion approach. For a low ? value (close to 0) the resulting model becomes very simple, regular and compact, but the data fit can be weak. Conversely, a high ? value (close to 1000) the data fit is very good (even by fitting some noise component), but the model can be very complex, sometimes even with artefacts. See application cases in the paper for choosing criteria.
+
+The pressure contrast value ?p can be selected also by doing some iterative running of the software. For very high values, the model becomes very condensed and compact, and some geometrical details can be lost. Conversely, for very low values the sources model becomes larger, with rounding inflated shape. In general, big displacements require strong pressure contrasts and small ones require low-pressure contrasts. We suggest, again, some iteration trying different values and observing the resulting anomalous geometry. Nevertheless, this is not a critical parameter. It concerns mostly to rather aesthetic aspects of the model. 
+
+Once the ConfigPAF.exe is completed (by pressing Run/OK in the GUI), it creates a new file, namely CellsConfig.txt. This is an intermediate file containing: 
+
+     (a) the assumed values for the inversion parameters (smoothing coefficient, pressure contrast, etc.), and 
+     (b) the geometrical parameters (location and sides) of the parallelepiped cells. 
+ 
+
+The values of the parameters contained in this file can be manually modified to adapt to the modeller necessities.
+  
+     For instance, the third parameter, “Significance limit (0<sig<10)”, gives the desired threshold between the significant cells (for those close and covered by the data points) from the non-significant cells (for those far from the data points). Its default value is 5, but the user can set optionally a different value (for instance, for a low significance threshold, nearly all cells will be considered as significant) .
+  
+     The fourth parameter (“Graphic output 0:no  1:YES”) is used to switch the graphical output during the inversion approach (see below the content of this graphical output). 
+  
+     The fifth parameter indicates that the data correspond to only one epoch, or conversely that the inversion has to be carried out in a sequential process of a number of epochs, starting at the epoch and with the data file identified by the sixth parameter.
+
+ 
+
+Once the file CellsConfig.txt is created (and optionally revised), the inversion approach by InverPAF.exe can start.
+It runs automatically, without any other requirement, and produce an optional visualization (fourth parameter in CellCnfig.txt) of the inversion process and of the results on the screen.
+In the case of sequential application, the InverPAF.exe process works continuously, epoch by epoch, until it inverts the data of the last epoch.
+
+As final product, the inversion approach creates an output file named ModPAF.txt containing the geometrical description of the resulting model, several others parameters of this model, and a detailed information about modelled and residual values. It will be described further on.
+
+
+
+2.3. OUTPUT FILES AND PICTURES
+
+A graphical output that can be optionally displayed throughout the inversion approach. This visual information contains some interesting graphics about the model growth process and about the final results. Statistics about the model growth process are: 
+
+        misfit value (see equation 4) evolution, 
+        pressure value evolution, 
+        planar and vertical elevation views (EW and NS) of the aggregation process (significant cells in red and dark blue, no significant cells in yellow and light blue, cells of a previous epoch in green), 
+        observed and modelled deformations (along EW and along NS), 
+        step by step values (step number, press value, root mean square (rms) residuals, cell depth). 
+
+Statistics about the final results are: misfit value, number of rejected data, number of filled cells, and number of significant cells.
+ 
+
+The main product of the PAF inversion is the file ModPAF.txt. This file contains the following information:
+
+     (1) A copy of the assumed inversion parameters similar to that in file CellConfig.txt.
+
+     (2) A list of the filled cells (those with no-null pressure values) containing, for each cells, the UTM coordinates X and Y (m), and the depth Z (m, above sea level) of its geometric center, their sides sizes sx ,sy ,sz (m), the corresponding positive or negative pressure contrast value, and a value for the significance (given by the inverse of the root mean square distance of the cell with respect to the data points, normalized to range from 0 to 20) (higher values correspond to more sensitive cells). This part can be used for further, more sophisticated, drawings of the resulting model.
+
+     (3) After that, some additional parameters and results about the inversion process are given, followed by a list of the observed, modelled and residual values for the data points. For each point, the file contains: UTM coordinates (m), altitude (m), observed, modelled and residual values (cm) for each component (dz, dx, dy), and an additional value for relative quality weighting (mean value 1) according to the resulting residual values for the three components. This part of the output file can be used for further drawings and statistical analysis of the inversion residuals (see examples below).
+
+In the case of sequential application of the PAF inversion approach, for each successive data file D…....txt (e.g., D00016.txt) corresponding to successive monitoring epochs (respective sixteenth epoch), the program generates a model file M…….txt (e.g., M00016.txt) with the same content as ModPAF.txt.
+
+ 
+
+2.4. COMPILING SPECIFICATIONS. 
+
+The used executable files come from compilation of Fortran codes by means of Microsoft Visual Studio Community 2015, within a Windows 10 operative system 64 bits.
+
+ 
+3. FINAL REMARKS
+
+PAF software allows, in a nearly automatic mode, to carry out an inversion of displacement data (1D to 3D) as extended 3D sources of overpressure bodies with free geometry. An elastic half-space response in assumed for the deformation calculus for each elementary source. The source bodies are described as aggregation of small cells filled with the prescribed pressure contrast. It works properly for volcanic areas, where deformations can be supposed as (mainly) due to subsurface pressure sources.
+The software requires to be tuned by choosing suitable values for two main parameters in the inversion approach: the smoothing coefficient ? (which controls the balance between data fit and model regularity in the regularity conditions) and the basic pressure contrast (in MPa). Suitable values for both parameters are normally selected in an trial and error way, looking for good model features (regularity, size, etc.) and good residual distribution (null autocorrelation of residuals). Nevertheless, the choice of these parameters is not too critical with respect to the main features of the resulting model.
+As shown in the application examples, the software can work for large data sets (for instance, coming from InSAR data), and for reduced sets of sequential data (for instance, coming from a small GPS monitoring network). It can work for fully 3D data, or also for 1D or 2D data. For both application examples, geometry of the resulting models offers interesting features to evaluate the deformation causative phenomenon.
+This software is composed by two executable programs, and can be downloaded freely from the web page of the journal or asking to the corresponding author. The first program (ConfigPAF.exe) allows the user to set (in a dialog mode) the values for the inversion parameters, and for the geometrical configuration of the small cells. The second program (InverPAF.exe) works with the results of the former program, and does not require any user involvement (display of intermediate or final result is optional). It can be incorporated into a larger software tool for monitoring at a volcanic observatory and even can run in an automatic way in real time, giving also very useful results.
+
+
